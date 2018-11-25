@@ -8,14 +8,15 @@ from django.utils import timezone
 class PortfolioID(models.Model):
 #connects users to their saved portfolios. Also contains information on the portfolio's goals and time horizon
 	portfolioID = models.AutoField(primary_key=True)
+	portfolioName = models.CharField(max_length = 15, default='filler')
 	userID = models.ForeignKey(User, on_delete=models.CASCADE)
 	goalValue = models.FloatField(default = 0.05)
 	timeHorizon = models.DateField(default=timezone.now)
 
 class stockID(models.Model):
 #contains information on particular stocks that is not appropriate to be stored elsewhere
-	tickerID = models.AutoField(primary_key=True)
-	companyName = models.TextField()
+	tickerID = models.CharField(max_length = 5, primary_key=True)
+	companyName = models.TextField(default='filler')
 	ipoDate = models.DateField(default=timezone.now)
 
 class PortfolioWeights(models.Model):
