@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" id="bootstrap-css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="../static/css/index.css" rel="stylesheet">
+    <link rel="icon" href="/static/default_files/index/cookielogo.png">
+  </head>
+
+  <style>
+
+    .graph .labels.x-labels {
+      text-anchor: middle;
+    }
+
+    .graph .labels.y-labels {
+      text-anchor: end;
+    }
+
+
+    .graph {
+      height: 500px;
+      width: 100%;
+    }
+
+    .graph .grid {
+      stroke: #ccc;
+      stroke-dasharray: 0;
+      stroke-width: 1;
+    }
+
+    .labels {
+      font-size: 13px;
+    }
+
+    .label-title {
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 12px;
+      fill: black;
+    }
+
+    .data {
+      fill: red;
+      stroke-width: 1;
+    }
+
+    /* pie chart */
+
+    $red = #F15854;
+$gray = #4D4D4D;
+$blue = #5DA5DA;
+$yellow = #DECF3F;
+$purple = #B276B2;
+$orange = #FAA43A;
+// colors from http://www.mulinblog.com/a-color-palette-optimized-for-data-visualization/
+
+.pie-chart {
+  background:
+    conic-gradient($red 4%,
+      $gray 0 8%,
+      $blue 0 17%,
+      $yellow 0 48%,
+      $purple 0 54%,
+      $orange 0
+      );
+      border-radius: 50%;
+      width: 50%;
+      height: 0;
+      padding-top: 50%;
+      float: left;
+      padding-right: 20px;
+}
+
+.key {
+  width: 50%;
+  float: right;
+  list-style: none;
+  display: table;
+  border-collapse: separate;
+  > li {
+    display: table-row;
+    > * {
+      display: table-cell;
+      border-bottom: 12px solid white;
+    }
+  }
+}
+
+.percent {
+  color: white;
+  padding: 10px 2px;
+  text-shadow: 0 0 1px black;
+  text-align: center;
+}
+.choice {
+  padding-left: 10px;
+}
+
+.red {
+  background: $red;
+}
+.gray {
+  background: $gray;
+}
+.blue {
+  background: $blue;
+}
+.yellow {
+  background: $yellow;
+}
+.purple {
+  background: $purple;
+}
+.orange {
+  background: $orange;
+}
+  </style>
+
+  <body>
+    <div class="row" style="position:fixed;top:0%;height:10%;width:100%">
+      <p style="width:100%;text-align:center"><strong style="font-size:40px">Recommendation For Goal</strong></p>
+    </div>
+    <div class="row" style="position:fixed;top:10%;height:70%;width:100%">
+
+      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+        <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graph" aria-labelledby="title" role="img">
+          <title id="title">A line chart showing some information</title>
+          <g class="grid x-grid" id="xGrid">
+            <line x1="90" x2="90" y1="5" y2="371"></line>
+          </g>
+          <g class="grid y-grid" id="yGrid">
+            <line x1="90" x2="705" y1="370" y2="370"></line>
+          </g>
+          <g class="labels x-labels">
+            <text x="100" y="400">2014</text>
+            <text x="246" y="400">2015</text>
+            <text x="392" y="400">2016</text>
+            <text x="538" y="400">2017</text>
+            <text x="684" y="400">2018</text>
+            <text x="400" y="440" class="label-title">Year</text>
+          </g>
+          <g class="labels y-labels">
+            <text x="80" y="15">30%</text>
+            <text x="80" y="131">20%</text>
+            <text x="80" y="248">10%</text>
+            <text x="80" y="373">0%</text>
+            <text x="50" y="200" class="label-title">Rate</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+        <div id="piechart"></div>
+      </div>
+
+    </div>
+
+    <div class="row" style="position:fixed;top:80%;height:20%;width:100%;">
+      <form style="margin-left:20%">
+        <p>Expect Annual Return: <input type="text" name="fname">
+        Time Horizon in Years: <input type="number" name="lname"></p>
+        <p><input style="margin-left:45%" type="submit" value="Submit" class="btn btn-success"><p>
+      </form>
+    </div>
+
+
+
+    <script
+      src="http://code.jquery.com/jquery-3.3.1.js"
+      integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+      crossorigin="anonymous"></script>
+
+    <script src="../static/javascript/index.js"></script>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+    // Load google charts
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Draw the chart and set the chart values
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+      ['Stock', 'weight'],
+      ['Stock A', 8],
+      ['Stock B', 2],
+      ['Stock C', 4],
+      ['Stock D', 2],
+      ['Stock E', 8]
+    ]);
+
+      // Optional; add a title and set the width and height of the chart
+      var options = {'title':'Portfolio Distribution', 'width':650, 'height':500};
+
+      // Display the chart inside the <div> element with id="piechart"
+      var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+      chart.draw(data, options);
+    }
+    </script>
+
+  </body>
+</html>

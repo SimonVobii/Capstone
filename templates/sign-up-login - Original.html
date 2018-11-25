@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    	<link rel="stylesheet" href="static/css/style.css">
+  </head>
+  <body>
+    <div id="id01" class="modal">
+      <div class="container-login100">
+        <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal" style="color:white;cursor:pointer">&times;</span>
+        <div class="wrap-login100">
+          <div class="login100-pic js-tilt" data-tilt style="margin-top:50px">
+            <img src="{% static 'default_files/index/kaws-ironman.jpg' %}" alt="IMG" style="object-fit:cover;object-position:top">
+          </div>
+
+          <form class="login100-form validate-form" action="" method="POST" id="register_form" data_registration_url="{% url 'account:ajax_user_register' %}" autocomplete="off">
+            {% csrf_token %}
+            <span class="login100-form-title">
+              <strong>用户注册</strong>
+            </span>
+
+            <div class="wrap-input100 validate-input">
+              <input type="text" placeholder="用户名" class="input100"  id="id_username" name="username"  autocomplete="off">
+              <!-- <p style="color:red" id="username_error"></p> -->
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-user" aria-hidden="true"></i>
+              </span>
+            </div>
+            <p style="color:red;padding-left:15px" id="username_error"></p>
+
+            <div class="wrap-input100 validate-input">
+              <input class="input100" type="email" autocomplete="off" placeholder="邮箱"  id="id_email" name="email">
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+              </span>
+            </div>
+            <p style="color:red;padding-left:15px" id="email_error"></p>
+
+            <div class="wrap-input100 validate-input">
+              <input type="password" autocomplete="off" placeholder="密码"  id="id_password" name="password" class="input100" >
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-lock" aria-hidden="true"></i>
+              </span>
+            </div>
+            <p style="color:red;padding-left:15px" id="password_error"></p>
+
+            <div class="wrap-input100 validate-input">
+              <input type="password" autocomplete="off" placeholder="确认密码"  id="id_verify_password" name="verify_password" class="input100" >
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-lock" aria-hidden="true"></i>
+              </span>
+            </div>
+            <p style="color:red;padding-left:15px" id="verify_password_error"></p>
+            <p style="color:red;padding-left:15px" id="general_error"></p>
+
+            <div class="container-login100-form-btn">
+              <input type="submit" class="login100-form-btn" name="" value="注册">
+            </div>
+
+            <div class="text-center p-t-136">
+              <a class="txt2 login-account" href="#">
+                用户登陆
+                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGIN BUTTON -->
+    <div id="id02" class="modal">
+      <div class="container-login100">
+        <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal" style="color:white;cursor:pointer">&times;</span>
+        <div class="wrap-login100">
+          <div class="login100-pic js-tilt" data-tilt>
+            <img src="{% static 'default_files/index/dior-ss19.jpg' %}" alt="IMG">
+          </div>
+          <form action="" method="POST" id="login_form" data_login_url="{% url 'account:ajax_user_login' %}" class="login100-form validate-form">
+            {% csrf_token %}
+            <span class="login100-form-title">
+            <strong>用户登陆</strong>
+            </span>
+
+            <div class="wrap-input100 validate-input">
+              <input class="input100" type="text" id="ajax_id_username" name="username" placeholder="Username" style="background-color: #e6e6e6;">
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-user" aria-hidden="true"></i>
+              </span>
+            </div>
+
+            <div class="wrap-input100 validate-input">
+              <input class="input100" type="password" placeholder="Password" id="ajax_id_password" name="password">
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-lock" aria-hidden="true"></i>
+              </span>
+            </div>
+
+            <div id="login_form_error" style="color:red; text-align:center;">
+            </div>
+
+            <div class="container-login100-form-btn">
+              <input type="submit" class="login100-form-btn" style="width:150px" name="" value="登陆">
+            </div>
+
+            <div class="text-center p-t-12">
+              <span class="txt1">
+                忘记
+              </span>
+              <a class="txt2" href="{% url 'account:password_reset' %}">
+                密码?
+              </a>
+            </div>
+
+            <div class="text-center p-t-136">
+              <a class="txt2 create-account" href="#">
+                创建账户
+                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="static/js/main.js"></script>
+  </body>
+</html>

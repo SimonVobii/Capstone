@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" id="bootstrap-css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="static/css/index.css" rel="stylesheet">
+    <link rel="icon" href="/static/default_files/index/cookielogo.png">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="../static/css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="../static/css/icomoon.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+
+    <!-- Magnific Popup -->
+    <link rel="stylesheet" href="../static/css/magnific-popup.css">
+
+    <!-- Owl Carousel  -->
+    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <!-- Flexslider  -->
+    <link rel="stylesheet" href="../static/css/flexslider.css">
+
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="../static/css/style.css">
+
+    <!-- Modernizr JS -->
+    <script src="../static/js/modernizr-2.6.2.min.js"></script>
+  </head>
+
+  <style>
+    .service-1{
+      background-image: url(../static/images/wall.jpg);
+      background-size: cover;
+      background-position: 32% 20%;
+    }
+
+    .service-2{
+      background-image: url(../static/images/rbc.jpg);
+      background-size: cover;
+      background-position: top;
+    }
+
+    .service-3{
+      background-image: url(../static/images/lion.jpg);
+      background-size: cover;
+      background-position: top;
+    }
+
+
+  </style>
+
+  <body>
+
+    <nav class="fh5co-nav" role="navigation">
+      <div class="top-menu">
+        <div class="container">
+          <div class="row">
+            <div class="col-xs-7">
+              <div id="fh5co-logo"><a href="{% url 'webapp-home' %}" style="font-size:25px">S<span>.</span>O<span>.</span>A<span>.</span>P<span>.</span></a></div>
+            </div>
+            <div class="col-xs-5 text-right menu-1">
+              {% if user.is_authenticated %}
+                <ul>
+                  {% if user.first_name == '' %}
+                    <li class="btn-cta"><a href="{% url 'select' %}"><span>{{request.user.username}}'s Services</span></a></li>
+                  {% else %}
+                    <li class="btn-cta"><a href="{% url 'select' %}"><span>{{request.user.first_name}}'s Services</span></a></li>
+                  {% endif %}
+                  <li class="btn-cta"><a href="{% url 'logout' %}"><span>Logout</span></a></li>
+                </ul>
+              {% else %}
+                <ul>
+                  <li class="btn-cta"><a href="{% url 'login' %}"><span>Login</span></a></li>
+                  <li class="btn-cta"><a href="{% url 'register' %}"><span>Sign Up</span></a></li>
+                </ul>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </nav>
+
+    <div class="row" style="position:fixed;height:100%;width:100%">
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 service-1">
+        <a href="{% url 'backtest' %}"><span style="position:absolute;top:40%;left:20%;right:10%;font-weight:bold;font-size:35px;color:white;">
+          Back Test Your Portfolio
+        </span></a>
+      </div>
+
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 service-2">
+        <a href="{% url 'better' %}"><span style="position:absolute;top:40%;left:20%;right:10%;font-weight:bold;font-size:35px;color:white;">
+          Similar and Better Portfolio
+        </span></a>
+      </div>
+
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 service-3">
+        <a href="{% url 'goal' %}"><span style="position:absolute;top:40%;left:20%;right:10%;font-weight:bold;font-size:35px;color:white;">
+          Portfolio For Your Goal
+        </span></a>
+      </div>
+    </div>
+
+    <script
+      src="http://code.jquery.com/jquery-3.3.1.js"
+      integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+      crossorigin="anonymous"></script>
+
+    <script src="static/javascript/index.js"></script>
+
+  </body>
+</html>
