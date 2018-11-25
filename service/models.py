@@ -53,4 +53,4 @@ class portfolioHistory(models.Model):
 
 class tester(models.Model):
 	firstName = models.CharField(max_length = 15)
-	dateTest = models.DateField(default = timezone.now)
+	#dateTest = models.DateField(default = timezone.now)

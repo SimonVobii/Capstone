@@ -6,4 +6,5 @@ admin.site.register(stockID)
 admin.site.register(PortfolioWeights)
 admin.site.register(stockHistory)
 admin.site.register(portfolioHistory)
+admin.site.register(tester)
 # Register your models here.
