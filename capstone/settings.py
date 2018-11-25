@@ -134,9 +134,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_REDIRECT_URL = 'select'
 LOGIN_URL = 'login'
 
+"""
 #Celery configuration for the automation of recurring tasks (namely database updating at EoD each day)
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+#CELERY_BROKER_URL = 'redis://localhost:6379'
+#CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
@@ -149,3 +150,4 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 10.0
     },
 }
+"""
