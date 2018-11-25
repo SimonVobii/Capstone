@@ -50,3 +50,7 @@ class portfolioHistory(models.Model):
 	portfolioID = models.ForeignKey(PortfolioID, on_delete=models.CASCADE)
 	tickerID = models.ForeignKey(stockID, on_delete=models.CASCADE)
 	dateID = models.DateField(auto_now=True)
+
+class tester(models.Model):
+	firstName = models.CharField(max_length = 15)
+	dateTest = models.DateField(default = timezone.now)
