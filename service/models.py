@@ -17,7 +17,7 @@ class stockID(models.Model):
 #contains information on particular stocks that is not appropriate to be stored elsewhere
 	tickerID = models.CharField(max_length = 5, primary_key=True)
 	companyName = models.TextField(default='filler')
-	ipoDate = models.DateField(default=timezone.now)
+	#ipoDate = models.DateField(default=timezone.now)
 
 class PortfolioWeights(models.Model):
 #contains the current asset weights that define each portfolio
@@ -52,5 +52,8 @@ class portfolioHistory(models.Model):
 	dateID = models.DateField(auto_now=True)
 
 class tester(models.Model):
-	firstName = models.CharField(max_length = 15)
+	date = models.DateField(editable=True)
+	ticker = models.CharField(max_length = 5, default="null")
+	assetPrice = models.FloatField(default = 0)
+	assetReturn = models.FloatField(default = 0)
 	#dateTest = models.DateField(default = timezone.now)

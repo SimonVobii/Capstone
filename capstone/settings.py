@@ -130,25 +130,12 @@ STATICFILES_DIRS = [STATIC_DIR,]
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'
 
+#Custom Imports
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'select'
 LOGIN_URL = 'login'
 
-"""
-#Celery configuration for the automation of recurring tasks (namely database updating at EoD each day)
-#CELERY_BROKER_URL = 'redis://localhost:6379'
-#CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Canada/Eastern'
+#Date Formats that allow us to load faster
 
-#the list of tasks that are scheduled to recurr
-CELERY_BEAT_SCHEDULE = {
-    'demo_task': {
-        'task': 'service.tasks.demo_task',
-        'schedule': 10.0
-    },
-}
-"""
+DATE_INPUT_FORMAT = ('%Y%m%d',)
