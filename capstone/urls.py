@@ -16,5 +16,6 @@ urlpatterns = [
     path('backtest/', service_views.backtest, name='backtest'),
     path('better/', service_views.better, name='better'),
     path('goal/', service_views.goal, name='goal'),
+    path('demo/', service_views.demo, name='demo'),
     path('admin/', admin.site.urls),
 ]

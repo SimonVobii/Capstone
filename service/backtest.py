@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 #from load import Loader
 from .QRLH import ScenarioGenerator
-from optimization import cvar_opt
+from .optimization import cvar_opt
 import gurobipy 
 
 class backtester:
@@ -82,30 +82,38 @@ class backtester:
         plt.clf()
 
 if __name__ == '__main__':
+    #constants for simulation, tuned to balance portfolio performance with calculation complexity
     hist_min_len = 1300
     scen_count = 5000
+
+    #USER_INPUT (this is in days)
     holding_period = 120
+    #USER_INPUT (as a fraction of total value)
+    port = {'EXPE': 0.5, 'MSFT': 0.5}
+
+
 
     #load in from data table
     #l = Loader()
-    ret = l.read('C:/Users/cici/Desktop/data/stockret.csv')
-    ret = l.filter(ret, hist_min_len)
-    port = {'EXPE': 0.5, 'MSFT': 0.5}
+    #ret = l.read('C:/Users/cici/Desktop/data/stockret.csv')
+    #ret = l.filter(ret, hist_min_len)
+    #filter anything less than 5 years
+
+    #class initialization
     b = backtester(holding_period, ret, port)
     f = b.forecast_randomwalk(scen_count)
 
+    #accumulated return on the last day (this is 5000x1)
     forecast_lastday = f[:, -1]
     mean = np.mean(forecast_lastday)
     std = np.std(forecast_lastday)
     cvar = np.percentile(forecast_lastday, 1)
     #print('mean is {0}, std is {1}, cvar is {2}'.format(mean, std, cvar))
 
-
+    #same thing again, using the second method (bootstrap, exponential with beta = 90)
     ret = l.filter(ret, hist_min_len)
     sg = ScenarioGenerator(ret, scenario_count=scen_count, period=holding_period)
     scen = sg.generate_imc_scenario(beta=90)
-    plt.hist(scen['AAPL'])
-    plt.savefig('scen.png')
     forecast_lastday = np.zeros(scen_count)
     for ticker in port:
         forecast_lastday += port[ticker] * scen[ticker]

@@ -3,7 +3,7 @@ import service.models as service_models
 
 def run(*args):
 	if 'load' in args:
-		with open("raw_data/stockret_demo.csv", newline='') as csvfile:
+		with open("raw_data/stockret_5.csv", newline='') as csvfile:
 			reader = csv.reader(csvfile, delimiter=',')
 			next(reader)
 			counter = 0
@@ -14,4 +14,5 @@ def run(*args):
 				if (counter%10000 == 0):
 					print(counter)
 	if 'delete' in args:
-		service_models.stockHistory.objects.all().delete()
+		#service_models.stockHistory.objects.all().delete()
+		print ("this is currently disabled to prevent accidental database deletion")

@@ -6,8 +6,9 @@ Created on Sun Oct 28 19:35:05 2018
 """
 
 import numpy as np
-from load import Loader
+#from load import Loader
 
+#generates 5000 scenarios from past return
 class ScenarioGenerator:
     
     def __init__(self, historical_return, scenario_count=5000, period=20):
@@ -33,6 +34,7 @@ class ScenarioGenerator:
             collected_securities[security] = np.prod(sampled_return, axis=1)
         return collected_securities
 
+#not used here
 if __name__ == '__main__':
     l = Loader()
     ret = l.read('C:/Users/cici/Desktop/data/stockret.csv')

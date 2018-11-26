@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import *
 from .backtest import *
+from .forms import *
+from .demo import *
 # Create your views here.
 
 @login_required
@@ -22,11 +24,15 @@ def better(request):
 @login_required
 def goal(request):
     return render(request, 'recommendforgoal.html')
-    #if request.method == ""
+#if request.method == ""
 
 
 def demo(request):
-	for i in range(1,5):
-		print(i)
-	return render(request, 'select.html')
+    if request.method == 'POST':
+        form = DropDownForm(request.POST)
+        if form.is_valid():
+            demoPlot()
+    else:
+        form = DropDownForm()
+    return render(request, 'demo.html', {'form': form})
 
