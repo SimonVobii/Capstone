@@ -4,6 +4,7 @@ from .models import *
 from .backtest import *
 from .forms import *
 from .demo import *
+import matplotlib.pyplot as plt, mpld3
 # Create your views here.
 
 @login_required
@@ -31,8 +32,11 @@ def demo(request):
     if request.method == 'POST':
         form = DropDownForm(request.POST)
         if form.is_valid():
-            demoPlot()
+            html_graph = demoPlot()
+            print("we valid boys")
+            #html_graph = mpld3.fig_to_html(fig)
     else:
         form = DropDownForm()
-    return render(request, 'demo.html', {'form': form})
+        html_graph = emptyPlot()
+    return render(request, 'demo.html', {'graph': html_graph, 'form': form})
 
