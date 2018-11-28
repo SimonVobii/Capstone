@@ -14,10 +14,6 @@ def select(request):
     #if request.method == ""
 
 @login_required
-def demo(request):
-    return render(request, 'backtest.html')
-
-@login_required
 def better(request):
     return render(request, 'recommend-better.html')
 
@@ -25,38 +21,39 @@ def better(request):
 def goal(request):
     return render(request, 'recommendforgoal.html')
 
-#def demo(request):
+def demo(request):
 #    if request.method == 'POST':
-#        form = DropDownForm(request.POST)
-#        if form.is_valid():
-            #html_graph = demoPlot()
-            #print("we valid boys")
-            #html_graph = mpld3.fig_to_html(fig)
+#        form = choiceSelect(request.POST)
+#
 #    else:
-#        form = DropDownForm()
-        #html_graph = emptyPlot()
-#    return render(request, 'demo.html', {'graph': html_graph, 'form': form})
+#        form = choiceSelect()
+#        #html_graph = emptyPlot()
+    return render(request, 'demo.html', {'form': form})
 
+@login_required
 def backtest(request):
     if request.method == 'POST':
-        form = portfolioSelection(request.user, request.POST)   #just added the request.user
+        form = backtestSelection(request.user, request.POST)   #just added the request.user
         if form.is_valid():
 
-            #loading portfolio weights from table
+            #loading user inputs from form
             portfolioChoice = form.cleaned_data['dropDown']
+            holding_period  = form.cleaned_data['holding_period']
+            histChoice  = form.cleaned_data['histChoice']
+
             portfolioAssets = list(PortfolioWeights.objects.filter(portfolioID = portfolioChoice))
             
             port = {}
             for i in portfolioAssets:
                 port[i.tickerID.tickerID] = i.volume
-                
-            html_graph = backtestScript()
+
+            html_graph = backtestScript(port, holding_period, histChoice)
             #print(type(html_graph))
             #print("we valid boys")
             #html_graph = mpld3.fig_to_html(fig)
     else:
 
-        form = portfolioSelection(request.user)
+        form = backtestSelection(request.user)
         html_graph = emptyPlot()
         #print(type(html_graph))
     return render(request, 'backtest_paul.html', {'graph':html_graph, 'form': form})

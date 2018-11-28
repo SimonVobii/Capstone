@@ -30,6 +30,8 @@ class ScenarioGenerator:
         for security in self.historical_return:
             # get historical return given the date indices
             sampled_return = self.historical_return[security][indices]
+            sampled_return = np.add(sampled_return, 1)
+            #print(sampled_return)
             # use product to get last day return
             collected_securities[security] = np.prod(sampled_return, axis=1)
         return collected_securities
