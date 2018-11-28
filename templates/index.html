@@ -59,11 +59,13 @@
 					<div class="col-xs-5 text-right menu-1">
 						{% if user.is_authenticated %}
 							<ul>
+
 								{% if user.first_name == '' %}
-									<li class="btn-cta"><a href="{% url 'select' %}"><span>{{request.user.username}}'s Services</span></a></li>
+									<li class="btn-cta"><a href="{% url 'portfolio' %}"><span>{{request.user.username}}'s Portfolios</span></a></li>
 								{% else %}
-									<li class="btn-cta"><a href="{% url 'select' %}"><span>{{request.user.first_name}}'s Services</span></a></li>
+									<li class="btn-cta"><a href="{% url 'portfolio' %}"><span>{{request.user.first_name}}'s Portfolios</span></a></li>
 								{% endif %}
+								<li class="btn-cta"><a href="{% url 'select' %}"><span>Portfolio Services</span></a></li>
 								<li class="btn-cta"><a href="{% url 'logout' %}"><span>Logout</span></a></li>
 							</ul>
 						{% else %}
