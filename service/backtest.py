@@ -51,7 +51,7 @@ class backtester:
         for ticker in self.portfolio:
             drift = np.mean(self.historical_return[ticker])
             volatility = np.std(self.historical_return[ticker])
-            print(volatility)
+            #print(volatility)
             sim_daily_ret = standard_normal * volatility + drift
             cum_prod = np.cumprod(sim_daily_ret, axis=1)
             forecast = forecast + cum_prod * self.portfolio[ticker]
@@ -173,3 +173,8 @@ def fullLoad():
         x=returnLoader(i)
         if len(x[i])>1300:
             ret.update(x)
+
+def emptyPlot():
+    fig = plt.figure()
+    plt.title('Awaiting Data Load')
+    return(mpld3.fig_to_html(fig))

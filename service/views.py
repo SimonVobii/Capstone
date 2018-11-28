@@ -14,29 +14,16 @@ def select(request):
     #if request.method == ""
 
 @login_required
-def backtest(request):
-    """if request.method == 'POST':
-        form = DropDownForm(request.POST)
-        if form.is_valid():
-            html_graph = demoPlot()
-            print("we valid boys")
-            #html_graph = mpld3.fig_to_html(fig)
-    else:
-        form = DropDownForm()
-        html_graph = emptyPlot()"""
+def demo(request):
     return render(request, 'backtest.html')
-    #if request.method == ""
 
 @login_required
 def better(request):
     return render(request, 'recommend-better.html')
-    #if request.method == ""
 
 @login_required
 def goal(request):
     return render(request, 'recommendforgoal.html')
-#if request.method == ""
-
 
 #def demo(request):
 #    if request.method == 'POST':
@@ -50,19 +37,28 @@ def goal(request):
         #html_graph = emptyPlot()
 #    return render(request, 'demo.html', {'graph': html_graph, 'form': form})
 
-def demo(request):
+def backtest(request):
     if request.method == 'POST':
         form = portfolioSelection(request.user, request.POST)   #just added the request.user
         if form.is_valid():
+
+            #loading portfolio weights from table
+            portfolioChoice = form.cleaned_data['dropDown']
+            portfolioAssets = list(PortfolioWeights.objects.filter(portfolioID = portfolioChoice))
+            
+            port = {}
+            for i in portfolioAssets:
+                port[i.tickerID.tickerID] = i.volume
+                
             html_graph = backtestScript()
-            print(type(html_graph))
+            #print(type(html_graph))
             #print("we valid boys")
             #html_graph = mpld3.fig_to_html(fig)
     else:
 
         form = portfolioSelection(request.user)
         html_graph = emptyPlot()
-        print(type(html_graph))
+        #print(type(html_graph))
     return render(request, 'backtest_paul.html', {'graph':html_graph, 'form': form})
 
 @login_required
@@ -95,7 +91,6 @@ def portfolio(request):
                 #pulling data for portfolio creation from form
                 p = PortfolioID(portfolioName = form.cleaned_data['portfolioName'], userID = request.user)
                 p.save()
-                print(p.pk)
 
                 #saving asset weights
                 asset1 = PortfolioWeights(portfolioID = p, tickerID = t1, volume = w1)
