@@ -52,16 +52,18 @@ def goal(request):
 
 def demo(request):
     if request.method == 'POST':
-        form = portfolioSelection(request.POST)
+        form = portfolioSelection(request.user, request.POST)   #just added the request.user
         if form.is_valid():
-            print("nice")
-            #html_graph = demoPlot()
+            html_graph = backtestScript()
+            print(type(html_graph))
             #print("we valid boys")
             #html_graph = mpld3.fig_to_html(fig)
     else:
 
         form = portfolioSelection(request.user)
-    return render(request, 'backtest_paul.html', {'form': form})
+        html_graph = emptyPlot()
+        print(type(html_graph))
+    return render(request, 'backtest_paul.html', {'graph':html_graph, 'form': form})
 
 @login_required
 def portfolio(request):

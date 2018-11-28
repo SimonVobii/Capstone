@@ -30,10 +30,11 @@
 	        {% if user.is_authenticated %}
 				<div class="navbar-nav mr-auto">
 					{% if user.first_name == '' %}
-						<a class="nav-item nav-link" href="{% url 'select' %}">{{request.user.username}}'s Services</a>
+						<a class="nav-item nav-link" href="{% url 'portfolio' %}">{{request.user.username}}'s Portfolios</a>
 					{% else %}
-						<a class="nav-item nav-link" href="{% url 'select' %}">{{request.user.first_name}}'s Services</a>
+						<a class="nav-item nav-link" href="{% url 'portfolio' %}">{{request.user.first_name}}'s Portfolios</a>
 					{% endif %}
+					<a class="nav-item nav-link" href="{% url 'select' %}">Portfolio Services</a>
 	          		<a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
 				</div>
 			{% else %}

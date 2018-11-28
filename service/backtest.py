@@ -6,11 +6,12 @@ Created on Sun Oct 28 19:35:05 2018
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt, mpld3
 #from load import Loader
 from .QRLH import ScenarioGenerator
 from .optimization import cvar_opt
 import gurobipy 
+from .models import *
 
 class backtester:
     
@@ -34,13 +35,15 @@ class backtester:
                 port_ret += self.portfolio[ticker] * np.prod(self.historical_return[ticker][i:i+self.period])
             port_ret = port_ret -1
             rets.append(port_ret)
-        line = plt.plot(np.divide(xs,252), rets)
-        plt.setp(line, color='r', linewidth=0.333)
+        line = plt.figure()
+        plt.plot(np.divide(xs,252), rets)
+        #plt.setp(line, color='r', linewidth=0.333)
         plt.title('portfolio return for given period')
         plt.xlabel('start year from today')
         plt.ylabel('cumulative return')
-        plt.savefig(path)
-        plt.clf()
+        return(mpld3.fig_to_html(line))
+        #plt.savefig(path)
+        #plt.clf()
 
     def forecast_randomwalk(self, scen_count = 5000):
         forecast = np.zeros((scen_count, self.period))
@@ -62,6 +65,7 @@ class backtester:
             color = 'g'
             if scenario[-1] < 0:
                 color = 'r'
+            fig = plt.figure()
             plt.plot(xs, scenario, color=color, linewidth=0.333)
         mean = np.mean(forecast, axis=0)
         fifth = np.percentile(forecast, 5, axis=0)
@@ -78,10 +82,12 @@ class backtester:
         plt.title('portfolio simulation')
         plt.xlabel('start date from today')
         plt.ylabel('cumulative return')
-        plt.savefig(path)
-        plt.clf()
+        return(mpld3.fig_to_html(fig))
+        #plt.savefig(path)
+        #plt.clf()
 
-if __name__ == '__main__':
+def backtestScript():
+#if __name__ == '__main__':
     #constants for simulation, tuned to balance portfolio performance with calculation complexity
     hist_min_len = 1300
     scen_count = 5000
@@ -91,13 +97,12 @@ if __name__ == '__main__':
     #USER_INPUT (as a fraction of total value)
     port = {'EXPE': 0.5, 'MSFT': 0.5}
 
-
-
-    #load in from data table
-    #l = Loader()
-    #ret = l.read('C:/Users/cici/Desktop/data/stockret.csv')
-    #ret = l.filter(ret, hist_min_len)
-    #filter anything less than 5 years
+    #load from database
+    ret = {}
+    for i in port:
+        x=returnLoader(i)
+        if len(x[i])>hist_min_len:
+            ret.update(x)
 
     #class initialization
     b = backtester(holding_period, ret, port)
@@ -111,7 +116,18 @@ if __name__ == '__main__':
     #print('mean is {0}, std is {1}, cvar is {2}'.format(mean, std, cvar))
 
     #same thing again, using the second method (bootstrap, exponential with beta = 90)
-    ret = l.filter(ret, hist_min_len)
+
+    """
+    full = []
+    for i in stockID.objects.all():
+        full.append(i.tickerID)
+
+    ret = {}
+    for i in full:
+        x=returnLoader(i)
+        if len(x[i])>1300:
+            ret.update(x)
+
     sg = ScenarioGenerator(ret, scenario_count=scen_count, period=holding_period)
     scen = sg.generate_imc_scenario(beta=90)
     forecast_lastday = np.zeros(scen_count)
@@ -120,12 +136,40 @@ if __name__ == '__main__':
     mean = np.mean(forecast_lastday) - 1
     std = np.std(forecast_lastday)
     cvar = np.percentile(forecast_lastday, 1) - 1
+    """
    # print(forecast_lastday)
    # print('mean is {0}, std is {1}, cvar is {2}'.format(mean, std, cvar))
    
-    # b.plot_rolling_return('./ret1.png')   
-    b.plot_forecast(f, './rw.png', plot_count=20)
-    b.plot_rolling_return('.rolling.png')
+    #return( b.plot_rolling_return('./ret1.png') )
+    return(b.plot_forecast(f, './rw.png', plot_count=20))
+    #b.plot_rolling_return('.rolling.png')
 
-    p = cvar_opt()
-    p.optimization(scen)
+    #p = cvar_opt()
+    #p.optimization(scen)
+
+def returnLoader(ticker):
+#loading data from database in format needed for business logic
+
+    loaded = list(stockHistory.objects.filter(tickerID = ticker))
+    
+    #initializing the dictionary object
+    finalDict = dict.fromkeys([ticker])
+    finalDict[ticker] = np.zeros(0)
+
+    #we know the database is stored oldest -> newest, can use this when appending returns
+    for i in loaded:
+        finalDict[ticker] = np.insert(finalDict[ticker], 0, i.assetReturn)
+
+    return(finalDict)
+
+def fullLoad():
+    
+    port = []
+    for i in stockID.objects.all():
+        port.append(i.tickerID)
+
+    ret = {}
+    for i in port:
+        x=returnLoader(i)
+        if len(x[i])>1300:
+            ret.update(x)

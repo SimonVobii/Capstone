@@ -33,12 +33,3 @@ class ScenarioGenerator:
             # use product to get last day return
             collected_securities[security] = np.prod(sampled_return, axis=1)
         return collected_securities
-
-#not used here
-if __name__ == '__main__':
-    l = Loader()
-    ret = l.read('C:/Users/cici/Desktop/data/stockret.csv')
-    ret = l.filter(ret, 1300)
-    sg = ScenarioGenerator(ret, scenario_count=5000)
-    scen = sg.generate_imc_scenario(beta=100)
-    print(scen)
