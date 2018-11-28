@@ -2,11 +2,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- Required meta tags -->
+	<!-- Required meta tags 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
    <link rel="stylesheet" type="text/css" href="../static/css/main_template.css"> 
@@ -15,11 +15,54 @@
 		<title>S.O.A.P. - {{ title }}</title>
 	{% else %}
 		<title>S.O.A.P.</title>
-	{% endif %}
+	{% endif %} -->
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="" />
+	<meta name="keywords" content=""/>
+
+
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content=""/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content=""/>
+	<meta property="og:description" content=""/>
+	<meta name="twitter:title" content="" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<link href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,700,800" rel="stylesheet">
+
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="../static/css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="../static/css/icomoon.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="../static/css/bootstrap.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="../static/css/magnific-popup.css">
+
+	<!-- Owl Carousel  -->
+	<link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+	<link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+	<!-- Flexslider  -->
+	<link rel="stylesheet" href="../static/css/flexslider.css">
+
+	<!-- Theme style  -->
+	<link rel="stylesheet" href="../static/css/style.css">
+
+	<!-- Modernizr JS -->
+	<script src="../static/js/modernizr-2.6.2.min.js"></script>
 	
 </head>
 <body>
 	<header class="site-header">
+	<!--
 	  <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
 	    <div class="container">
 	      <a class="navbar-brand mr-4" href="/">S.O.A.P.</a>
@@ -44,20 +87,44 @@
 				</div>
 			{% endif %}
 
-	        <!--<div class="navbar-nav mr-auto">
-	          <a class="nav-item nav-link" href="/">Home</a>
-	          <a class="nav-item nav-link" href="/about">About</a>
-	        </div> -->
-	        <!-- Navbar Right Side 
-	        <div class="navbar-nav">
-	          <a class="nav-item nav-link" href="#">Login</a>
-	          <a class="nav-item nav-link" href="#">Register</a>
-	        </div> -->
+
 	      </div>
 	    </div>
-	  </nav>
+	  </nav> -->
+
+		<nav class="fh5co-nav" role="navigation">
+	      <div class="top-menu">
+	        <div class="container">
+	          <div class="row">
+	            <div class="col-xs-7">
+	              <div id="fh5co-logo"><a href="{% url 'webapp-home' %}" style="font-size:25px">S<span>.</span>O<span>.</span>A<span>.</span>P<span>.</span></a></div>
+	            </div>
+	            <div class="col-xs-5 text-right menu-1">
+	              {% if user.is_authenticated %}
+	                <ul>
+	                  {% if user.first_name == '' %}
+	                    <li class="btn-cta"><a href="{% url 'portfolio' %}"><span>{{request.user.username}}'s Portfolios</span></a></li>
+	                  {% else %}
+	                    <li class="btn-cta"><a href="{% url 'portfolio' %}"><span>{{request.user.first_name}}'s Portfolios</span></a></li>
+	                  {% endif %}
+	                  <li class="btn-cta"><a href="{% url 'select' %}"><span>Portfolio Services</span></a></li>
+	                  <li class="btn-cta"><a href="{% url 'logout' %}"><span>Logout</span></a></li>
+	                </ul>
+	              {% else %}
+	                <ul>
+	                  <li class="btn-cta"><a href="{% url 'login' %}"><span>Login</span></a></li>
+	                  <li class="btn-cta"><a href="{% url 'register' %}"><span>Sign Up</span></a></li>
+	                </ul>
+	              {% endif %}
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	    </nav>
+
 	</header>
 	<main role="main" class="container">
+		<!-- style="background-color: #F0F8FF"-->
   		<div class="row">
 		    <div class="col-md-8">
 		    	{% if messages %}
