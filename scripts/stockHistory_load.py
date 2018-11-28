@@ -3,7 +3,7 @@ import service.models as service_models
 
 def run(*args):
 	if 'load' in args:
-		with open("raw_data/stockret_5.csv", newline='') as csvfile:
+		with open("raw_data/etfindex.csv", newline='') as csvfile:
 			reader = csv.reader(csvfile, delimiter=',')
 			next(reader)
 			counter = 0

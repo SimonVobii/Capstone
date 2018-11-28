@@ -26,7 +26,7 @@ def survey(request):
         if survey_form.is_valid():
             save_it = survey_form.save(commit = False)
             save_it.user = request.user
-            save_it .save()
+            save_it.save()
             messages.success(request, f'Questionnaire Data Saved')
             return redirect('select')
         else:
