@@ -68,12 +68,27 @@ class backtester:
             forecast = forecast + cum_prod * self.portfolio[ticker]
         forecast = forecast - 1
         return np.concatenate((np.zeros((scen_count, 1)), forecast), axis=1)
+    
+    def forecast_bootstrap(self, scen_count):
+    #same thing again, using the second method (bootstrap, exponential with beta = 63), as there are 63 trading 
+    #days in a quarter
 
-    def plot_forecast(self, forecast, path, plot_count = 10):
-    # plot plot_count number of forecasts
+        sg = ScenarioGenerator(self.historical_return, scenario_count=scen_count, period=self.period)
+        scen = sg.generate_imc_scenario(beta=63)
+        forecast_lastday = np.zeros(scen_count)
+        for ticker in self.portfolio:
+            forecast_lastday += self.portfolio[ticker] * scen[ticker]
+        return(forecast_lastday)
 
+    def plot_forecast(self, forecast, path, forecast_lastday, plot_count = 20):
+    # plots a multiplot containing forecasted return via random walk on the top, and histogram returns on bottom
+
+        fig = plt.figure(figsize=(7.5,5))
+        #gridspec.GridSpec(3,3)
         #***PRIMARY PLOT***
-        fig = plt.figure()
+        
+        #(ax0, ax1) = plt.subplots(nrows=2, ncols=1)
+        plt.subplot2grid((10,3),(0,0), colspan=3,rowspan=6)
         #if positive return green color, if negative it's red
         xs = list(range(self.period + 1))
         for scenario in forecast[:plot_count]:
@@ -105,6 +120,11 @@ class backtester:
         #***PRIMARY PLOT END***
 
         #***SECONDARY HISTORGRAM PLOT***
+        plt.subplot2grid((10,3),(7,0), colspan=3,rowspan=3)
+        #plt.subplot(212, figsize=(2,6))
+        plt.hist(forecast_lastday) 
+
+        #***SECONDARY PLOT END***
 
 
         return(mpld3.fig_to_html(fig))
@@ -136,16 +156,8 @@ def backtestScript(port, holding_period, histChoice):
     mean = np.mean(forecast_lastday)
     std = np.std(forecast_lastday)
     cvar = np.percentile(forecast_lastday, 1)
-    
 
-    #same thing again, using the second method (bootstrap, exponential with beta = 63), as there are 63 trading 
-    #days in a quarter
-    sg = ScenarioGenerator(ret, scenario_count=scen_count, period=holding_period)
-    scen = sg.generate_imc_scenario(beta=63)
-    forecast_lastday = np.zeros(scen_count)
-    for ticker in port:
-        forecast_lastday += port[ticker] * scen[ticker]
-        #print(scen[ticker])
+    forecast_lastday = b.forecast_bootstrap(scen_count)
     mean = np.mean(forecast_lastday) -1
     std = np.std(forecast_lastday)
     cvar = np.percentile(forecast_lastday, 1) - 1
@@ -153,7 +165,7 @@ def backtestScript(port, holding_period, histChoice):
     if histChoice=='Historical':
         return(b.plot_rolling_return('./ret1.png') )
     else:
-        return(b.plot_forecast(f, './rw.png', plot_count=10))
+        return(b.plot_forecast(f, './rw.png',forecast_lastday, plot_count=20))
 
     fig = plt.figure()
     plt.hist(forecast_lastday) #,bins= np.linspace(-0.1, 0.26, num = 20))
