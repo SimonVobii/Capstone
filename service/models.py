@@ -6,7 +6,7 @@ from account.models import *
 from django.utils import timezone
 
 class PortfolioID(models.Model):
-#connects users to their saved portfolios. Also contains information on the portfolio's goals and time horizon
+#connects users to their saved portfolios
 	portfolioID = models.AutoField(primary_key=True)
 	portfolioName = models.CharField(max_length = 15, default='filler')
 	userID = models.ForeignKey(User, on_delete=models.CASCADE)
