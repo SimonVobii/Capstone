@@ -83,7 +83,7 @@ class backtester:
     def plot_forecast(self, forecast, path, forecast_lastday, plot_count = 20):
     # plots a multiplot containing forecasted return via random walk on the top, and histogram returns on bottom
 
-        fig = plt.figure(figsize=(7.5,5))
+        fig = plt.figure(figsize=(9.25,5))
         #gridspec.GridSpec(3,3)
         #***PRIMARY PLOT***
         
@@ -206,6 +206,12 @@ def fullLoad():
     return(ret)
 
 def emptyPlot():
-    fig = plt.figure()
+    fig = plt.figure(figsize=(9.25,5))
+    np.random.seed(0)
+    x, y = np.random.normal(size=(2, 200))
+    color, size = np.random.random((2, 200))
+
+    plt.scatter(x, y, c=color, s=500 * size, alpha=0.3)
     plt.title('Awaiting Data Load')
+
     return(mpld3.fig_to_html(fig))

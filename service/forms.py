@@ -18,6 +18,15 @@ class optimizeGoalForm(forms.Form):
 	returnGoal = forms.FloatField(min_value=0, max_value=1.0, label='Return Objective')
 	holding_period = forms.IntegerField(min_value=22, max_value=1300, label = 'Time Horizon')
 
+class betterPortForm(forms.Form):
+	def __init__(self, user, *args, **kwargs):
+		self.user = kwargs.pop('user', None)
+		super(betterPortForm, self).__init__(*args, **kwargs)
+		self.fields['dropDown'].queryset = PortfolioID.objects.filter(userID = user.id)
+	dropDown = forms.ModelChoiceField(queryset=PortfolioID.objects, label = 'Portfolio to Beat')
+	returnGoal = forms.FloatField(min_value=0, max_value=1.0, label='Return Objective')
+	#holding_period = forms.IntegerField(min_value=22, max_value=1300, label = 'Time Horizon')
+
 class portfolioForm(forms.Form):
 	portfolioName = forms.CharField(max_length = 15, label='Portfolio Name')
 

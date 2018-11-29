@@ -7,16 +7,22 @@
 			{% csrf_token %}
 		<fieldset class="form-group">
 			<legend class="border-bottom mb-4">
-				Portfolio Creator
+				Select a Portfolio to Dominate over CVaR
 			</legend>
 			{{ form|crispy }}
 		</fieldset>
 		<div class="form-group">
-			<button class="btn btn-primary" type="submit"> Create Portfolio</button>
+			<button class="btn btn-primary" type="submit"> Test Portfolio</button>
 			
 		</div>
 		</form>
 
+	</div>
+	<div style="margin-left:-30%;padding:0px;">
+		{{graph|safe}}
+	</div>
+	<div class="form-group">
+			<button class="btn btn-primary" type="submit"> Save Result</button>	
 	</div>
 
 {% endblock content %}
