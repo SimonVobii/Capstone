@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import *
 from .backtest import *
+from .optimization import *
 from .forms import *
 from .demo import *
 import matplotlib.pyplot as plt, mpld3
@@ -19,6 +20,34 @@ def better(request):
 
 @login_required
 def goal(request):
+    if request.method == 'POST':
+        form = optimizeGoalForm(request.POST)   #just added the request.user
+        if form.is_valid():
+            optimizeScript()
+
+            #loading user inputs from form
+            #portfolioChoice = form.cleaned_data['dropDown']
+            #holding_period  = form.cleaned_data['holding_period']
+            #histChoice  = form.cleaned_data['histChoice']
+
+            #portfolioAssets = list(PortfolioWeights.objects.filter(portfolioID = portfolioChoice))
+            
+            #port = {}
+            #for i in portfolioAssets:
+            #    port[i.tickerID.tickerID] = i.volume
+
+            html_graph = optimizeGoalForm()#backtestScript(port, holding_period, histChoice)
+            #print(type(html_graph))
+            #print("we valid boys")
+            #html_graph = mpld3.fig_to_html(fig)
+    else:
+
+        form = optimizeGoalForm()
+        html_graph = emptyPlot()
+        #print(type(html_graph))
+    return render(request, 'backtest_paul.html', {'graph':html_graph, 'form': form})
+
+
     return render(request, 'recommendforgoal.html')
 
 def demo(request):
@@ -32,6 +61,34 @@ def demo(request):
 
 @login_required
 def backtest(request):
+    if request.method == 'POST':
+        form = backtestSelection(request.user, request.POST)   #just added the request.user
+        if form.is_valid():
+
+            #loading user inputs from form
+            portfolioChoice = form.cleaned_data['dropDown']
+            holding_period  = form.cleaned_data['holding_period']
+            histChoice  = form.cleaned_data['histChoice']
+
+            portfolioAssets = list(PortfolioWeights.objects.filter(portfolioID = portfolioChoice))
+            
+            port = {}
+            for i in portfolioAssets:
+                port[i.tickerID.tickerID] = i.volume
+
+            html_graph = backtestScript(port, holding_period, histChoice)
+            #print(type(html_graph))
+            #print("we valid boys")
+            #html_graph = mpld3.fig_to_html(fig)
+    else:
+
+        form = backtestSelection(request.user)
+        html_graph = emptyPlot()
+        #print(type(html_graph))
+    return render(request, 'backtest_paul.html', {'graph':html_graph, 'form': form})
+
+@login_required
+def optimizeGoal(request):
     if request.method == 'POST':
         form = backtestSelection(request.user, request.POST)   #just added the request.user
         if form.is_valid():

@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt, mpld3
 #from load import Loader
 from .QRLH import ScenarioGenerator
-from .optimization import cvar_opt
+#from .optimization import cvar_opt
 import gurobipy 
 from .models import *
 
@@ -72,13 +72,14 @@ class backtester:
     def plot_forecast(self, forecast, path, plot_count = 10):
     # plot plot_count number of forecasts
 
+        #***PRIMARY PLOT***
+        fig = plt.figure()
         #if positive return green color, if negative it's red
         xs = list(range(self.period + 1))
         for scenario in forecast[:plot_count]:
             color = 'g'
             if scenario[-1] < 0:
                 color = 'r'
-            fig = plt.figure()
             plt.plot(xs, scenario, color=color, linewidth=0.333)
 
         #three other lines showing projections of 5th, 95th, and 50th percentile
@@ -101,6 +102,11 @@ class backtester:
         plt.title('Portfolio Simulation')
         plt.xlabel('Start Date from Today')
         plt.ylabel('Cumulative Return')
+        #***PRIMARY PLOT END***
+
+        #***SECONDARY HISTORGRAM PLOT***
+
+
         return(mpld3.fig_to_html(fig))
 
 def backtestScript(port, holding_period, histChoice):
@@ -145,7 +151,7 @@ def backtestScript(port, holding_period, histChoice):
     cvar = np.percentile(forecast_lastday, 1) - 1
     
     if histChoice=='Historical':
-        return( b.plot_rolling_return('./ret1.png') )
+        return(b.plot_rolling_return('./ret1.png') )
     else:
         return(b.plot_forecast(f, './rw.png', plot_count=10))
 
@@ -185,6 +191,7 @@ def fullLoad():
         x=returnLoader(i)
         if len(x[i])>1300:
             ret.update(x)
+    return(ret)
 
 def emptyPlot():
     fig = plt.figure()
