@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+	<div style="padding:0px;">
+    	<p><strong>Input Portfolio Monthly Chacteristics</strong> Return: {{inreturn}} CVar: {{incvar}} Sharpe: {{insharpe}}</p>
+    	<p><strong>Output Portfolio Monthly Chacteristics</strong> Return: {{outreturn}} CVar: {{outcvar}} Sharpe: {{outsharpe}}</p>
+   	</div>
+	<div style="padding:0px;">
+		{{graph|safe}}
+	</div>
+	<div class ="content-section">
+		<form method="POST">
+			{% csrf_token %}
+		<fieldset class="form-group">
+			<legend class="border-bottom mb-4">
+				Select a Return Goal and Time Horizon
+			</legend>
+			{{ form|crispy }}
+		</fieldset>
+		<div class="form-group">
+			<button class="btn btn-primary" type="submit"> Save Resulting Portfolio</button>
+			
+		</div>
+		</form>
+	</div>
+	
+
+{% endblock content %}

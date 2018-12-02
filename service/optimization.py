@@ -130,3 +130,23 @@ def plotPie(sizes, labels):
     plt.axis('equal')
     plt.tight_layout()
     return(mpld3.fig_to_html(fig))
+
+def plotDualPie(sizes1, labels1, sizes2, labels2):
+
+    fig = plt.figure()
+
+    plt.subplot2grid((3,7),(0,0), colspan=3,rowspan=3)
+    patches1, texts1 = plt.pie(sizes1,shadow=True, startangle=90) #labels = labels, shadow=True, startangle=90)
+    plt.legend(patches1, labels1, loc="best")
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.title('Input Portfolio')
+
+    plt.subplot2grid((3,7),(0,4), colspan=3,rowspan=3)
+    patches2, texts2 = plt.pie(sizes2,shadow=True, startangle=90) #labels = labels, shadow=True, startangle=90)
+    plt.legend(patches2, labels2, loc="best")
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.title('Output Portfolio')
+
+    return(mpld3.fig_to_html(fig))

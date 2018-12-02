@@ -35,7 +35,7 @@ class betterPortForm(forms.Form):
 		super(betterPortForm, self).__init__(*args, **kwargs)
 		self.fields['dropDown'].queryset = PortfolioID.objects.filter(userID = user.id)
 	dropDown = PortfolioModelChoiceField(queryset=PortfolioID.objects.order_by('portfolioName'), label = 'Portfolio to Beat')
-	returnGoal = forms.FloatField(min_value=0, max_value=1.0, label='Return Objective')
+	#returnGoal = forms.FloatField(min_value=0, max_value=1.0, label='Return Objective')
 	#holding_period = forms.IntegerField(min_value=22, max_value=1300, label = 'Time Horizon')
 
 class portfolioForm(forms.Form):

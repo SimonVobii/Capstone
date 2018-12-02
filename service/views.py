@@ -19,14 +19,93 @@ def better(request):
     if request.method == 'POST':
         form = betterPortForm(request.user, request.POST)   #just added the request.user
         if form.is_valid():
-            optimizeScript()
+            inputPortfolio = form.cleaned_data['dropDown']
 
-            html_graph = optimizeGoalForm()
+            portfolioAssets = list(PortfolioWeights.objects.filter(portfolioID = inputPortfolio))
+            
+            #storing input portfolio for comparison later
+            port = {}
+            for i in portfolioAssets:
+                port[i.tickerID.tickerID] = i.volume
+
+            inputSizes = []
+            inputLabels = []
+            for i in port:
+                inputLabels.append(i)
+                inputSizes.append(port[i] * 100)
+
+            inputReturn, inputCvar, inputSharpe = currentCVAR(port)
+
+            goalReturn, goalCvar, goalSharpe, goal_sizes, goal_labels = optimizeScript(inputReturn)
+
+            #saving metrics to session for passing
+            request.session['inputSizes'] = inputSizes
+            request.session['inputLabels'] = inputLabels
+            request.session['inputReturn'] = inputReturn
+            request.session['inputCvar'] = inputCvar
+            request.session['inputSharpe'] = inputSharpe
+
+            request.session['outputSizes'] = goal_sizes
+            request.session['outputLabels'] = goal_labels
+            request.session['outputReturn'] = str(round(goalReturn*100, 2))+"%"
+            request.session['outputCvar'] = str(round(goalCvar*100, 2))+"%"
+            request.session['outputSharpe'] = str(round(goalSharpe, 2))
+
+            messages.success(request, f'Optimization Completed Successfully')
+            return redirect('betterRender')
+        
     else:
-
         form = betterPortForm(request.user)
         html_graph = emptyPlot()
     return render(request, 'recommend_better_paul.html', {'graph':html_graph, 'form': form})
+
+@login_required
+def betterRender(request):
+    #this seperate function handles the plotting and saving of the improved portfolio after the optimization algorithms are complete
+    insizes = request.session.get('inputSizes')
+    inlabels = request.session.get('inputLabels')
+    inReturn = request.session.get('inputReturn')
+    inCvar = request.session.get('inputCvar')
+    inSharpe = request.session.get('inputSharpe')
+
+    outsizes = request.session.get('outputSizes')
+    outlabels = request.session.get('outputLabels')
+    outReturn = request.session.get('outputReturn')
+    outCvar = request.session.get('outputCvar')
+    outSharpe = request.session.get('outputSharpe')
+
+    print(insizes, inlabels, outsizes, outlabels)
+
+    html_graph = plotDualPie(insizes, inlabels, outsizes, outlabels)
+
+    if request.method == 'POST':
+        form = portfolioSaveForm(request.POST)
+        if form.is_valid():
+
+            #portfolio creation code
+            portName = form.cleaned_data['portfolioName']
+            p = PortfolioID(portfolioName = portName, userID = request.user)
+            p.save()
+
+            for i in range(0,len(outlabels)):
+                saveTicker = stockID.objects.get(pk=outlabels[i])
+                asset = PortfolioWeights(portfolioID = p, tickerID = saveTicker, volume = outsizes[i]/100)
+                asset.save()
+
+            #freeing session variables to prevent leakage into other functions
+            request.session['sizes'] = []
+            request.session['labels'] = []
+            request.session['portfolioReturn'] = ''
+            request.session['cvar'] = ''
+            request.session['sharpe'] = ''
+
+            #message and returning to select menu
+            messages.success(request, f'Portfolio {portName} Saved Successfully')
+            return redirect('select')
+        
+    else:  
+        form = portfolioSaveForm()
+    return render(request, 'betterRender_paul.html', {'form':form, 'graph':html_graph, 'inreturn':portReturn, 'incvar':portCvar, 'insharpe':portSharpe, 'outreturn':portReturn, 'outcvar':portCvar, 'outsharpe':portSharpe})
 
 @login_required
 def goal(request):
@@ -84,26 +163,36 @@ def goalRender(request):
                 asset = PortfolioWeights(portfolioID = p, tickerID = saveTicker, volume = sizes[i]/100)
                 asset.save()
 
+            #freeing session variables to prevent leakage into other functions
+            request.session['sizes'] = []
+            request.session['labels'] = []
+            request.session['portfolioReturn'] = ''
+            request.session['cvar'] = ''
+            request.session['sharpe'] = ''
+
+            #message and returning to select menu
             messages.success(request, f'Portfolio {portName} Saved Successfully')
             return redirect('select')
         
-    else:
-        
+    else:  
         form = portfolioSaveForm()
-        #html_graph = emptyPlot()
-        #goalReturn, goalCvar, goalSharpe = '','',''
-        #print(type(html_graph))
     return render(request, 'goalRender_paul.html', {'form':form, 'graph':html_graph, 'return':portReturn, 'cvar':portCvar, 'sharpe':portSharpe})
 
 def demo(request):
-    global_label.append("happy")
-    return redirect('goalRender')
-    #html_graph = demoPie()
-    #form = optimizeGoalForm()
-    #return render(request, 'demo.html', {'form': form, 'demoVar':6, 'graph':html_graph})
+    sizes1 = [0.5,0.3,0.2]
+    labels1 = ['tesing','testing','testing']
+
+    sizes2 = [0.7,0.1,0.2]
+    labels2 = ['testing','tesing','testing']
+
+    html_graph = plotDualPie(sizes1, labels1, sizes2, labels2)
+    form = optimizeGoalForm()
+    return render(request, 'demo.html', {'form': form, 'demoVar':6, 'graph':html_graph})
 
 @login_required
 def backtest(request):
+#preforms backtesting (or forward projection) using a given portfolio
+
     if request.method == 'POST':
         form = backtestSelection(request.user, request.POST)   #just added the request.user
         if form.is_valid():
@@ -136,35 +225,6 @@ def backtest(request):
         mean_backtest, cvar_backtest, sharpe_backtest = '','',''
 
     return render(request, 'backtest_paul.html', {'graph':html_graph, 'form': form, 'return': mean_backtest, 'cvar':cvar_backtest, 'sharpe':sharpe_backtest})
-
-"""
-@login_required
-def optimizeGoal(request):
-    if request.method == 'POST':
-        form = backtestSelection(request.user, request.POST)   #just added the request.user
-        if form.is_valid():
-
-            #loading user inputs from form
-            portfolioChoice = form.cleaned_data['dropDown']
-            holding_period  = form.cleaned_data['holding_period']
-            histChoice  = form.cleaned_data['histChoice']
-
-            portfolioAssets = list(PortfolioWeights.objects.filter(portfolioID = portfolioChoice))
-            
-            port = {}
-            for i in portfolioAssets:
-                port[i.tickerID.tickerID] = i.volume
-
-            html_graph = backtestScript(port, holding_period, histChoice)
-
-    else:
-
-        form = backtestSelection(request.user)
-        html_graph = emptyPlot()
-        #print(type(html_graph))
-    return render(request, 'goal_paul.html', {'graph':html_graph, 'form': form})
-
-"""
 
 @login_required
 def portfolio(request):
