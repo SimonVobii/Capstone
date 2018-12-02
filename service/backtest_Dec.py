@@ -11,7 +11,7 @@ from scipy.optimize import minimize
 from load import Loader
 from QRLH import ScenarioGenerator
 from optimization import cvar_opt
-from cvaropt import opt
+#from cvar_opt import opt
 import gurobipy 
 
 class backtester:
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     holding_period =120
 
     l = Loader()
-    ret = l.read('C:/Users/cici/Desktop/data/stockret.csv')
+    ret = l.read('stockret.csv')
     ret = l.filter(ret, hist_min_len)
     port = {'EXPE': 0.5, 'MSFT': 0.5}
     b = backtester(holding_period, ret, port)
@@ -151,8 +151,10 @@ if __name__ == '__main__':
 
 
     p = cvar_opt()
-    mean_opt, cvar_opt, sharpe_opt = p.optimization(scen_monthly,0.0356)
-    print(mean_opt,cvar_opt,sharpe_opt)
+    #mean_opt, cvar_opt, sharpe_opt = 
+    p.optimization(scen_monthly,0.0256)
+    
+    #print(mean_opt,cvar_opt,sharpe_opt)
 
 
 

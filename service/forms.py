@@ -23,8 +23,11 @@ class backtestSelection(forms.Form):
 	histChoice = forms.ChoiceField(choices = [("Historical","Historical"),("Forecast","Forecast")], label = 'Historical or Forecast')
 
 class optimizeGoalForm(forms.Form):
-	returnGoal = forms.FloatField(min_value=0, max_value=1.0, label='Return Objective')
-	holding_period = forms.IntegerField(min_value=22, max_value=1300, label = 'Time Horizon')
+	returnGoal = forms.FloatField(min_value=0, max_value=100, label='Return Objective (Percent)')
+	holdingPeriod = forms.IntegerField(min_value=22, max_value=1300, label = 'Investment Horizon (Days)', initial=252)
+
+class portfolioSaveForm(forms.Form):
+	portfolioName = forms.CharField(max_length = 35, label='Portfolio Name')
 
 class betterPortForm(forms.Form):
 	def __init__(self, user, *args, **kwargs):
@@ -36,7 +39,7 @@ class betterPortForm(forms.Form):
 	#holding_period = forms.IntegerField(min_value=22, max_value=1300, label = 'Time Horizon')
 
 class portfolioForm(forms.Form):
-	portfolioName = forms.CharField(max_length = 15, label='Portfolio Name')
+	portfolioName = forms.CharField(max_length = 35, label='Portfolio Name')
 
 	ticker1 = AssetModelChoiceField(queryset=stockID.objects.order_by('tickerID').all(), label='Asset 1')
 	weight1 = forms.FloatField(max_value=1, min_value=0, label='Volume of Asset 1')

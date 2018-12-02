@@ -9,93 +9,106 @@ class cvar_opt:
     #Takes a certain return objective, and arrives at a portfolio consisting of the investment universie that minimizes portfolio CVaR
 
         m = Model("model1")
-        z, c, x, expected_ret, l, quant = {}, {}, {}, {}, {}, {}
+        z, c, x,expected_ret, quant = {}, {}, {}, {}, {}
         # Create variables
         for i in range(5000):
-            z[i] = m.addVar(lb = 0, obj = 1/(0.05*5000), vtype=GRB.CONTINUOUS, name="z[%s]"%i)
-
-        #for all assets in universe
+            z[i] = m.addVar(lb = 0, vtype=GRB.CONTINUOUS, name="z[%s]"%i)
         for i in range(len(ret)):
-            x[i] = m.addVar(lb = -0.2, ub = 0.2, vtype=GRB.CONTINUOUS, name="x[%s]"%i)
+            x[i] = m.addVar(lb = 0, ub = 0.15, vtype=GRB.CONTINUOUS, name="x[%s]"%i)
         #for i in range(206):
             #l[i] = m.addVar(vtype=GRB.BINARY, name="l[%s]"%i)
         m.update()
         
-        #calculates the mean & standard deviation of asset returns
         j = 0       
         total_ret = LinExpr()
         for keys in ret:
             expected_ret[keys] = np.mean(ret[keys]) - 1
             std = np.std(ret[keys])
-            total_ret+= x[j]*(expected_ret[keys])
+            total_ret+= x[j]*expected_ret[keys]
             j = j+1
           
-        #setting up return constraint
+        #print (total_ret)
         m.addConstr(total_ret >= ret_goal,"ret goal")
         m.update()
-        
-        #setting up optimization
+
         v = LinExpr()
-        obj = LinExpr()
-        obj += v
-        m.setObjective(obj, GRB.MINIMIZE)  
-        m.update()  
-        sum = 0
-        var = 0
-        
-        #Calculates the 5% CVaR of each asset
+ 
+        var = {}
         p = 0
         for keys in ret:
-            sum = 0
-            var = np.percentile(ret[keys], 0.05)
-            v += x[p]*var
-            for i in range (5000):
-                if ret[keys][i] <= var:
-                    sum += (1/5000)*(ret[keys][i] - 1)
-            quant[keys] = sum  
-            p = p + 1
+            var[keys] = np.percentile((ret[keys]-1)*-1,95)
+            v+= x[p]*var[keys]
+            p = p+1
+     
+        obj = LinExpr()
+        obj += v
+        for i in range(5000):
+            obj+=1/(0.05*5000)*z[i]
+        #obj +=y
+        m.setObjective(obj, GRB.MINIMIZE)  
         m.update()
         
-        #weight constraint
         weightconstraint =LinExpr()
+ 
         for i in range(len(ret)):
             weightconstraint+=x[i]
         m.addConstr(weightconstraint == 1, "k1")
-
-        #cardinalityconstraint =LinExpr()    
-        #for i in range(206):
-         #   cardinalityconstraint+=l[i]
-        #m.addConstr(cardinalityconstraint == 206, "k2")
-        #m.update()
       
-        #Set of constraints resulting from model formulation
         for i in range (5000):
             c[i] = LinExpr()
             k = 0 
             for keys in ret:          
-                c[i]+=(ret[keys][i] - 1)*(-1)*x[k]
+                c[i]+=(-1)*(ret[keys][i] - 1)*x[k]
                 k = k+1              
             m.addConstr(z[i] >= c[i] - v, "c[%s]"%i)
             m.update()
-        
-        #run optimization
         m.optimize()
 
-        #printing out allocations and returns
+
         i =0 
-        Return = 0
-        CVaR = 0
+        portfolioReturn = 0
         for keys in expected_ret:
             if x[i].X !=0:
-                print ('allocate',x[i].X,'in',keys)
-                Return += x[i].X*expected_ret[keys]
-                CVaR += x[i].X*quant[keys]
+                #print ('allocate',x[i].X,'in',keys)
+                portfolioReturn += x[i].X*expected_ret[keys]
+                #CVaR += x[i].X*quant[keys]
+            i = i+1 
+        #print(ret_goal)
+        
+        labels = []
+        sizes = []
+        
+        i =0 
+        ret_port = np.zeros(5000)
+        for keys in ret:
+            if x[i].X !=0:
+                ret_port +=(ret[keys]-1)*x[i].X
+                labels.append(str(keys))
+                sizes.append(x[i].X*100)
+                
             i = i+1 
 
-        print (Return)
-        print(CVaR)
+        riskfree = np.mean(ret['SHV'])-1
+        std = np.std(ret_port)
+        portfolioReturn = np.mean(ret_port)
+        sharpe = (portfolioReturn - riskfree)/std
+        var = np.percentile(ret_port,5)
+        cvar = np.mean(ret_port[ret_port<var])
 
-def optimizeScript():
+        #printing HTML output
+        #fig = plt.figure()
+        #print(sizes)
+        #print(labels)
+        #patches, texts = plt.pie(sizes, labels = labels, shadow=True, startangle=90)
+        #plt.legend(patches, labels, loc="best")
+        #plt.axis('equal')
+        #plt.tight_layout()
+        #returnGraph = mpld3.fig_to_html(fig)
+        #returnGraph = emptyPlot()
+
+        return (portfolioReturn, cvar, sharpe, sizes, labels)
+
+def optimizeScript(goal):
 
     ret = fullLoad()
 
@@ -103,4 +116,17 @@ def optimizeScript():
     scen_op = sg_op.generate_imc_scenario(beta=120) 
 
     p = cvar_opt()
-    p.goalOptimizer(scen_op, 0.05)
+    mean_port, cvar_port, sharpe_port, sizes, labels = p.goalOptimizer(scen_op, goal)
+    
+    return(mean_port, cvar_port, sharpe_port, sizes, labels)
+
+def plotPie(sizes, labels):
+    fig = plt.figure()
+    #sizes = [0.5,0.3,0.2]
+    #labels = ['tesing','testing','testing']
+
+    patches, texts = plt.pie(sizes,shadow=True, startangle=90) #labels = labels, shadow=True, startangle=90)
+    plt.legend(patches, labels, loc="best")
+    plt.axis('equal')
+    plt.tight_layout()
+    return(mpld3.fig_to_html(fig))

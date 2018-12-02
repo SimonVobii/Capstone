@@ -24,6 +24,29 @@ class backtester:
         self.portfolio = portfolio
         self.historical_return = historical_return
 
+    def profile_monthly_parameter(self,port,scen,scen_count):
+        # optain 5000 montly user portfolio returns from simulated scenarios
+        monthly_ret = np.zeros(scen_count)
+        for ticker in port:
+            monthly_ret += port[ticker] * scen[ticker]
+        
+        monthly_ret = monthly_ret - 1
+
+        # get expected mean from 5000 scenarios
+        mean = np.mean(monthly_ret) 
+        std = np.std(monthly_ret)
+        # find the lowest 5th percentile of the scenarios
+        var = np.percentile(monthly_ret, 5) 
+
+        # take expected value for montly returns below var to obtain cvar
+        cvar =np.mean(monthly_ret[monthly_ret<var])
+        # risk free is approximated by expected monthly return of iShare < 1year treasury bill rets 
+        riskfree = np.mean(scen['SHV'])-1
+
+        # sharpe ratio  = expected mean - risk free over the standard deviation of returns 
+        sharpe = (mean - riskfree)/std
+        return (mean,cvar,sharpe)
+
     def plot_rolling_return(self, path):
         xs = []
         rets = []
@@ -215,3 +238,25 @@ def emptyPlot():
     plt.title('Awaiting Data Load')
 
     return(mpld3.fig_to_html(fig))
+
+def currentCVAR(port):
+
+    #holding period set to one month of trading days
+    holding_period = 22
+
+    #preparing the ret matrix
+    ret = {}
+    for i in port:
+        x=returnLoader(i)
+        if len(x[i])>1300:
+            ret.update(x)
+    x=returnLoader('SHV')
+    ret.update(x)
+
+    #class initialization
+    b = backtester(holding_period, ret, port)
+    sg_monthly = ScenarioGenerator(ret,scenario_count = 5000, period = 21)
+    scen_monthly = sg_monthly.generate_imc_scenario(beta = 120)
+
+    mean_port, cvar_port, sharpe_port = b.profile_monthly_parameter(port,scen_monthly,5000)
+    return(mean_port,cvar_port,sharpe_port)

@@ -9,7 +9,7 @@ Created on Wed Nov 28 10:40:04 2018
 from gurobipy import *
 import numpy as np
 from scipy.stats import norm
-
+import matplotlib.pyplot as plt
 
 class cvar_opt:
     def optimization(self,ret,ret_goal):
@@ -19,7 +19,7 @@ class cvar_opt:
         for i in range(5000):
             z[i] = m.addVar(lb = 0, vtype=GRB.CONTINUOUS, name="z[%s]"%i)
         for i in range(len(ret)):
-            x[i] = m.addVar(lb = 0, ub = 0.2, vtype=GRB.CONTINUOUS, name="x[%s]"%i)
+            x[i] = m.addVar(lb = 0, ub = 0.15, vtype=GRB.CONTINUOUS, name="x[%s]"%i)
         #for i in range(206):
             #l[i] = m.addVar(vtype=GRB.BINARY, name="l[%s]"%i)
         m.update()
@@ -109,12 +109,17 @@ class cvar_opt:
             i = i+1 
         #print(ret_goal)
         
+        labels = []
+        sizes = []
+        
         i =0 
         ret_port = np.zeros(5000)
         for keys in ret:
             if x[i].X !=0:
                 ret_port +=(ret[keys]-1)*x[i].X
-            
+                labels.append(str(keys))
+                sizes.append(x[i].X*100)
+                
             i = i+1 
         #print(ret_port)
 
@@ -124,10 +129,20 @@ class cvar_opt:
        # print(min(ret_port))
         sharpe = (Return - riskfree)/std
         var = np.percentile(ret_port,5)
-        print('var',var)
+        #print('var',var)
         cvar = np.mean(ret_port[ret_port<var])
 
-        return(Return,cvar,sharpe)
+        print ("The return is: ", Return)
+        print ("The optimized portfolio CVaR is: ", cvar)
+        print ("The optimized portfolio Sharpe Ratio is: ", sharpe)
+        
+
+
+        patches, texts = plt.pie(sizes, labels = labels, shadow=True, startangle=90)
+        plt.legend(patches, labels, loc="best")
+        plt.axis('equal')
+        plt.tight_layout()
+        plt.show()
      
         
         

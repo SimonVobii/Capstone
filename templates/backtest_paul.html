@@ -12,15 +12,14 @@
 		</fieldset>
 		<div class="form-group">
 			<button class="btn btn-primary" type="submit"> Test Portfolio</button>
-			
 		</div>
 		</form>
-
 	</div>
-	<div class="row" style="width:100%;">
-		<div style="width: 50%;margin-left: 25%;margin-right: 25%;"> 
-			{{graph|safe}}
-		</div>
+	<div style="padding:0px;">
+    	<p><strong>Portfolio Chacteristics</strong> Return: {{return}} CVar: {{cvar}} Sharpe: {{sharpe}}</p>
+   	</div>
+	<div> 
+		{{graph|safe}}
 	</div>
 
 {% endblock content %}
