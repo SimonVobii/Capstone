@@ -21,26 +21,11 @@ def better(request):
         if form.is_valid():
             optimizeScript()
 
-            #loading user inputs from form
-            #portfolioChoice = form.cleaned_data['dropDown']
-            #holding_period  = form.cleaned_data['holding_period']
-            #histChoice  = form.cleaned_data['histChoice']
-
-            #portfolioAssets = list(PortfolioWeights.objects.filter(portfolioID = portfolioChoice))
-            
-            #port = {}
-            #for i in portfolioAssets:
-            #    port[i.tickerID.tickerID] = i.volume
-
-            html_graph = optimizeGoalForm()#backtestScript(port, holding_period, histChoice)
-            #print(type(html_graph))
-            #print("we valid boys")
-            #html_graph = mpld3.fig_to_html(fig)
+            html_graph = optimizeGoalForm()
     else:
 
         form = betterPortForm(request.user)
         html_graph = emptyPlot()
-        #print(type(html_graph))
     return render(request, 'recommend_better_paul.html', {'graph':html_graph, 'form': form})
 
 @login_required
@@ -50,21 +35,8 @@ def goal(request):
         if form.is_valid():
             optimizeScript()
 
-            #loading user inputs from form
-            #portfolioChoice = form.cleaned_data['dropDown']
-            #holding_period  = form.cleaned_data['holding_period']
-            #histChoice  = form.cleaned_data['histChoice']
-
-            #portfolioAssets = list(PortfolioWeights.objects.filter(portfolioID = portfolioChoice))
-            
-            #port = {}
-            #for i in portfolioAssets:
-            #    port[i.tickerID.tickerID] = i.volume
-
-            html_graph = optimizeGoalForm()#backtestScript(port, holding_period, histChoice)
-            #print(type(html_graph))
-            #print("we valid boys")
-            #html_graph = mpld3.fig_to_html(fig)
+            html_graph = optimizeGoalForm()
+        
     else:
 
         form = optimizeGoalForm()
@@ -99,14 +71,12 @@ def backtest(request):
                 port[i.tickerID.tickerID] = i.volume
 
             html_graph = backtestScript(port, holding_period, histChoice)
-            #print(type(html_graph))
-            #print("we valid boys")
-            #html_graph = mpld3.fig_to_html(fig)
+
     else:
 
         form = backtestSelection(request.user)
         html_graph = emptyPlot()
-        #print(type(html_graph))
+
     return render(request, 'backtest_paul.html', {'graph':html_graph, 'form': form})
 
 @login_required
@@ -127,9 +97,7 @@ def optimizeGoal(request):
                 port[i.tickerID.tickerID] = i.volume
 
             html_graph = backtestScript(port, holding_period, histChoice)
-            #print(type(html_graph))
-            #print("we valid boys")
-            #html_graph = mpld3.fig_to_html(fig)
+
     else:
 
         form = backtestSelection(request.user)

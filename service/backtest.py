@@ -83,7 +83,7 @@ class backtester:
     def plot_forecast(self, forecast, path, forecast_lastday, plot_count = 20):
     # plots a multiplot containing forecasted return via random walk on the top, and histogram returns on bottom
 
-        fig = plt.figure(figsize=(9.25,5))
+        fig = plt.figure() #figsize=(9.25,5))
         #gridspec.GridSpec(3,3)
         #***PRIMARY PLOT***
         

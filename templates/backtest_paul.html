@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-
 	<div class ="content-section">
 		<form method="POST">
 			{% csrf_token %}
@@ -18,8 +17,10 @@
 		</form>
 
 	</div>
-	<div style="margin-left:-30%;padding:0px;">
-		{{graph|safe}}
+	<div class="row" style="width:100%;">
+		<div style="width: 50%;margin-left: 25%;margin-right: 25%;"> 
+			{{graph|safe}}
+		</div>
 	</div>
 
 {% endblock content %}

@@ -92,7 +92,15 @@
           </div>
 
         </div>
+        
       </div>
+      {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+        {% endif %}
     </nav>
 
     <div class="row" style="position:fixed;height:100%;width:102%">
