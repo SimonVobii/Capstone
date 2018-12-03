@@ -317,7 +317,8 @@ def portfolio(request):
 
            # if(weight_sum == 1):
                 #pulling data for portfolio creation from form
-            p = PortfolioID(portfolioName = form.cleaned_data['portfolioName'], userID = request.user)
+            inputPortfolioName =form.cleaned_data['portfolioName'] 
+            p = PortfolioID(portfolioName = inputPortfolioName, userID = request.user)
             p.save()
 
             #converting volumes to weights
@@ -347,7 +348,7 @@ def portfolio(request):
                 print(volumeToValue(t3,1))
                 asset3.save()
 
-            messages.success(request, f'Portfolio Successfully Created')
+            messages.success(request, f'Portfolio "{inputPortfolioName}" Successfully Created')
             return redirect('select')
             #else:
             #    messages.error(request, f'Weights must sum to 1')

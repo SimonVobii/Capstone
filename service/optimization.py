@@ -151,7 +151,7 @@ class cvar_opt:
         #print("sharpe is {0:.3f}".format((np.mean(port_ret) - riskfree) / np.std(port_ret)))
 
         optimizedReturn = np.std(port_ret)
-        optimizedCvar = np.mean(port_ret[port_ret < np.percentile(port_ret, 1)])
+        optimizedCvar = np.mean(port_ret[port_ret < np.percentile(port_ret, 5)])
         optimizedSharpe = (np.mean(port_ret) - riskfree) / np.std(port_ret)
 
         #sol.x is the list of weights

@@ -19,7 +19,7 @@ class backtestSelection(forms.Form):
 		super(backtestSelection, self).__init__(*args, **kwargs)
 		self.fields['dropDown'].queryset = PortfolioID.objects.filter(userID = user.id)
 	dropDown = PortfolioModelChoiceField(queryset=PortfolioID.objects.order_by('portfolioName'), label = 'Portfolio to Test') #queryset=PortfolioID.objects.filter(userID=user)
-	holding_period = forms.IntegerField(min_value=22, max_value=1300, label = 'Holding Period', initial=120)
+	holding_period = forms.IntegerField(min_value=22, max_value=1300, label = 'Holding Period', initial=22)
 	histChoice = forms.ChoiceField(choices = [("Historical","Historical"),("Forecast","Forecast")], label = 'Historical or Forecast')
 
 class optimizeGoalForm(forms.Form):
