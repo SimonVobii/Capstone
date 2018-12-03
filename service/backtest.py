@@ -211,9 +211,26 @@ def returnLoader(ticker):
 
     #we know the database is stored oldest -> newest, can use this when appending returns
     for i in loaded:
-        #inverse loading
+
         #finalDict[ticker] = np.insert(finalDict[ticker], 0, i.assetReturn)
         finalDict[ticker] = np.append(finalDict[ticker], i.assetReturn)
+
+    return(finalDict)
+
+def priceLoader(ticker):
+#loading data from database in format needed for business logic
+
+    loaded = list(stockHistory.objects.filter(tickerID = ticker))
+    
+    #initializing the dictionary object
+    finalDict = dict.fromkeys([ticker])
+    finalDict[ticker] = np.zeros(0)
+
+    #we know the database is stored oldest -> newest, can use this when appending returns
+    for i in loaded:
+        #inverse loading
+        #finalDict[ticker] = np.insert(finalDict[ticker], 0, i.assetReturn)
+        finalDict[ticker] = np.append(finalDict[ticker], i.assetPrice)
 
     return(finalDict)
 

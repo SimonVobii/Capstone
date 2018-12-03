@@ -14,6 +14,10 @@ def select(request):
     return render(request, 'select.html')
     #if request.method == ""
 
+def volumeToValue(ticker, volume):
+   
+   return(priceLoader(ticker.tickerID)[ticker.tickerID][-1]*volume)
+
 @login_required
 def better(request):
     if request.method == 'POST':
@@ -105,7 +109,7 @@ def betterRender(request):
         
     else:  
         form = portfolioSaveForm()
-    return render(request, 'betterRender_paul.html', {'form':form, 'graph':html_graph, 'inreturn':portReturn, 'incvar':portCvar, 'insharpe':portSharpe, 'outreturn':portReturn, 'outcvar':portCvar, 'outsharpe':portSharpe})
+    return render(request, 'betterRender_paul.html', {'form':form, 'graph':html_graph, 'inreturn':inReturn, 'incvar':inCvar, 'insharpe':inSharpe, 'outreturn':outReturn, 'outcvar':outCvar, 'outsharpe':outSharpe})
 
 @login_required
 def goal(request):
@@ -179,13 +183,14 @@ def goalRender(request):
     return render(request, 'goalRender_paul.html', {'form':form, 'graph':html_graph, 'return':portReturn, 'cvar':portCvar, 'sharpe':portSharpe})
 
 def demo(request):
-    sizes1 = [0.5,0.3,0.2]
-    labels1 = ['tesing','testing','testing']
+    #sizes1 = [0.5,0.3,0.2]
+    #labels1 = ['tesing','testing','testing']
 
-    sizes2 = [0.7,0.1,0.2]
-    labels2 = ['testing','tesing','testing']
+    #sizes2 = [0.7,0.1,0.2]
+    #labels2 = ['testing','tesing','testing']
 
-    html_graph = plotDualPie(sizes1, labels1, sizes2, labels2)
+    volumeToValue(stockID.objects.filter(tickerID='AAPL')[0], 0)
+    html_graph = emptyPlot()
     form = optimizeGoalForm()
     return render(request, 'demo.html', {'form': form, 'demoVar':6, 'graph':html_graph})
 
@@ -247,32 +252,43 @@ def portfolio(request):
             w2 = form.cleaned_data['weight2']
             w3 = form.cleaned_data['weight3']
 
+            """
             #checking that weights sum to 1
             weight_sum = w1
             weight_sum += 0 if(t2 is None) else 0 if(w2 is None) else w2
             weight_sum += 0 if(t3 is None) else 0 if(w3 is None) else w3
+            """
 
-            if(weight_sum == 1):
+           # if(weight_sum == 1):
                 #pulling data for portfolio creation from form
-                p = PortfolioID(portfolioName = form.cleaned_data['portfolioName'], userID = request.user)
-                p.save()
+            p = PortfolioID(portfolioName = form.cleaned_data['portfolioName'], userID = request.user)
+            p.save()
 
-                #saving asset weights
-                asset1 = PortfolioWeights(portfolioID = p, tickerID = t1, volume = w1)
-                asset1.save()
+            #converting volumes to weights
+            val1 = volumeToValue(t1, w1)
+            val2 = volumeToValue(t2, w2)
+            val3 = volumeToValue(t3, w3)
+            tot_val = val1 + val2 + val3
 
-                if ((t2 is not None) and (w2 is not None)):
-                    asset2 = PortfolioWeights(portfolioID = p, tickerID = t2, volume = w2)
-                    asset2.save()
+            #saving asset weights
+            asset1 = PortfolioWeights(portfolioID = p, tickerID = t1, volume = val1/tot_val)
+            print(volumeToValue(t1,1))
+            asset1.save()
 
-                if ((t3 is not None) and (w3 is not None)):
-                    asset3 = PortfolioWeights(portfolioID = p, tickerID = t3, volume = w3)
-                    asset3.save()
+            if ((t2 is not None) and (w2 is not None)):
+                asset2 = PortfolioWeights(portfolioID = p, tickerID = t2, volume = val2/tot_val)
+                print(volumeToValue(t2,1))
+                asset2.save()
 
-                messages.success(request, f'Portfolio Successfully Created')
-                return redirect('select')
-            else:
-                messages.error(request, f'Weights must sum to 1')
+            if ((t3 is not None) and (w3 is not None)):
+                asset3 = PortfolioWeights(portfolioID = p, tickerID = t3, volume = val3/tot_val)
+                print(volumeToValue(t3,1))
+                asset3.save()
+
+            messages.success(request, f'Portfolio Successfully Created')
+            return redirect('select')
+            #else:
+            #    messages.error(request, f'Weights must sum to 1')
     else:
         form = portfolioForm()
     return render(request, 'portfolio_paul.html', {'form': form})

@@ -42,10 +42,10 @@ class portfolioForm(forms.Form):
 	portfolioName = forms.CharField(max_length = 35, label='Portfolio Name')
 
 	ticker1 = AssetModelChoiceField(queryset=stockID.objects.order_by('tickerID').all(), label='Asset 1')
-	weight1 = forms.FloatField(max_value=1, min_value=0, label='Volume of Asset 1')
+	weight1 = forms.FloatField(max_value=1000, min_value=0, label='Volume of Asset 1')
 
 	ticker2 = AssetModelChoiceField(queryset=stockID.objects.order_by('tickerID').all(), required=False, label='Asset 2')
-	weight2 = forms.FloatField(max_value=1, min_value=0, required=False, label='Volume of Asset 2')
+	weight2 = forms.FloatField(max_value=1000, min_value=0, required=False, label='Volume of Asset 2')
 	
 	ticker3 = AssetModelChoiceField(queryset=stockID.objects.order_by('tickerID').all(), required=False, label='Asset 3')
-	weight3 = forms.FloatField(max_value=1, min_value=0, required=False, label='Volume of Asset 3')
+	weight3 = forms.FloatField(max_value=1000, min_value=0, required=False, label='Volume of Asset 3')
