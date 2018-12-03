@@ -172,6 +172,8 @@ def backtestScript(port, holding_period, histChoice):
         if len(x[i])>hist_min_len:
             ret.update(x)
 
+
+    #print(ret)
     #class initialization
     b = backtester(holding_period, ret, port)
     f = b.forecast_randomwalk(scen_count)
@@ -260,9 +262,7 @@ def emptyPlot():
 
 def currentCVAR(port):
 
-    #holding period set to one month of trading days
     holding_period = 22
-
     #preparing the ret matrix
     ret = {}
     for i in port:

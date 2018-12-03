@@ -3,6 +3,7 @@ import numpy as np
 import pandas
 from .backtest import *
 from .QRLH import *
+from scipy.optimize import minimize
 
 class cvar_opt:
     def goalOptimizer(self,ret,ret_goal):
@@ -108,6 +109,86 @@ class cvar_opt:
 
         return (portfolioReturn, cvar, sharpe, sizes, labels)
 
+    def goalOptimizer2(self,ret,goal, short=False):
+        keys = list(ret.keys())
+        keys.sort()
+
+        # sort the returns and transform into np array
+        sorted_ret = np.array([ret[key] for key in keys])
+
+        print("in optimization function")
+        # initially evenly distributed
+        x0 = np.ones(len(keys)) / len(keys)
+
+        #print("before optimization")
+        port_ret = np.dot(sorted_ret.T, x0) - 1
+        riskfree = np.mean(ret['SHV']) - 1
+        #print("return is {0:.3f}".format(np.mean(port_ret)))
+        #print("std is {0:.3f}".format(np.std(port_ret)))
+        #print("var is {0:.3f}".format(np.percentile(port_ret, 1)))
+        #print("cvar is {0:.3f}".format(np.mean(port_ret[port_ret < np.percentile(port_ret, 1)])))
+        #print("sharpe is {0:.3f}".format((np.mean(port_ret) - riskfree) / np.std(port_ret)))
+        #print()
+
+        if short:
+            con = ({"fun":constraint1, "type":"ineq", 'args':(sorted_ret, goal)}, {"fun":constraint2, "type":"eq"})
+            sol = minimize(objective, x0, args=(sorted_ret), constraints=con)
+        else:
+            b = (0.0, 1.0)
+            bnds = []
+            for i in range(x0.size):
+                bnds.append(b)
+            bnds = tuple(bnds)
+            con = ({"fun":constraint1, "type":"ineq", 'args':(sorted_ret, goal)}, {"fun":constraint2, "type":"eq"})
+            sol = minimize(objective, x0, args=(sorted_ret), bounds=bnds, constraints=con)
+
+        #print("after optimization")
+        port_ret = np.dot(sorted_ret.T, sol.x) - 1
+        #print("return is {0:.3f}".format(np.mean(port_ret)))
+        #print("std is {0:.3f}".format(np.std(port_ret)))
+        #print("var is {0:.3f}".format(np.percentile(port_ret, 1)))
+        #print("cvar is {0:.3f}".format(np.mean(port_ret[port_ret < np.percentile(port_ret, 1)])))
+        #print("sharpe is {0:.3f}".format((np.mean(port_ret) - riskfree) / np.std(port_ret)))
+
+        optimizedReturn = np.std(port_ret)
+        optimizedCvar = np.mean(port_ret[port_ret < np.percentile(port_ret, 1)])
+        optimizedSharpe = (np.mean(port_ret) - riskfree) / np.std(port_ret)
+
+        #sol.x is the list of weights
+        security_names = np.array(keys)
+        #names = security_names[index]
+        weightList = sol.x.tolist()
+        labelList = security_names.tolist()
+        #print(sol.x)
+        #print(security_names)
+        #index = np.where(sol.x > 0.03)
+        #big = sol.x[index]
+        #big = np.concatenate((big, [1-np.sum(big)]))
+        #return this for labels
+        #names = security_names[index]
+        print("leaving optimization function")
+        return(optimizedReturn, optimizedCvar, optimizedSharpe, weightList, labelList)
+        #print(sol.x)
+        #print(sum(sol.x))
+        #print(security_names)
+        #names = np.concatenate((names, ['other']))
+        #labels = ["{0}: {1:.3f}".format(x, y) for x, y in zip(names, big)]
+        #plt.pie(big, labels=labels)
+        #plt.show()
+        #return big
+
+def objective(x, ret):
+    port_ret = -1 * (np.dot(ret.T, x) - 1)
+    var = np.percentile(port_ret, 95)
+    objective = var + 1 / 0.05 * np.mean(np.max(port_ret - var, 0))
+    return objective
+
+def constraint1(x, ret, target):
+    return np.mean(np.dot(ret.T, x) - 1) - target
+            
+def constraint2(x):
+    return np.sum(x)-1
+
 def optimizeScript(goal):
 
     ret = fullLoad()
@@ -117,7 +198,7 @@ def optimizeScript(goal):
 
     p = cvar_opt()
     mean_port, cvar_port, sharpe_port, sizes, labels = p.goalOptimizer(scen_op, goal)
-    
+    print("leaving optimization script")
     return(mean_port, cvar_port, sharpe_port, sizes, labels)
 
 def plotPie(sizes, labels):
@@ -150,3 +231,14 @@ def plotDualPie(sizes1, labels1, sizes2, labels2):
     plt.title('Output Portfolio')
 
     return(mpld3.fig_to_html(fig))
+
+def optimizeScript2(goal):
+    ret = fullLoad()
+
+    sg_op = ScenarioGenerator(ret, scenario_count=5000, period=22)
+    scen_op = sg_op.generate_imc_scenario(beta=120) 
+
+    p = cvar_opt()
+    mean_port, cvar_port, sharpe_port, sizes, labels = p.goalOptimizer2(scen_op, goal)
+
+    return(mean_port, cvar_port, sharpe_port, sizes, labels)

@@ -15,8 +15,45 @@ def select(request):
     #if request.method == ""
 
 def volumeToValue(ticker, volume):
-   
    return(priceLoader(ticker.tickerID)[ticker.tickerID][-1]*volume)
+
+def pieCompressor(sizes, labels, threshold):
+#used to make the pie chart display with reasonable # of buckets
+    return_sizes = []
+    return_labels = []
+    othersize = 0.0
+
+    for i in range(0,len(sizes)):
+        if sizes[i]<threshold:
+            othersize += sizes[i]
+        else:
+            return_sizes.append(sizes[i])
+            return_labels.append(labels[i])
+
+    return_sizes.append(othersize)
+    return_labels.append('other')
+    return(return_sizes, return_labels)
+
+def portfolioCompressor(sizes, labels, threshold):
+#removes assets that are less than threshold percent of the total portfolio value
+    return_sizes = []
+    return_labels = []
+    removedSize = 0.0
+
+    for i in range(0,len(sizes)):
+        if sizes[i]<threshold:
+            removedSize += sizes[i]
+        else:
+            return_sizes.append(sizes[i])
+            return_labels.append(labels[i])
+
+    for i in range(0, len(return_labels)):
+        return_sizes[i] = return_sizes[i] * (1/(1-removedSize))
+
+    #print(sum(return_sizes))
+    return(return_sizes, return_labels)
+
+
 
 @login_required
 def better(request):
@@ -40,14 +77,14 @@ def better(request):
 
             inputReturn, inputCvar, inputSharpe = currentCVAR(port)
 
-            goalReturn, goalCvar, goalSharpe, goal_sizes, goal_labels = optimizeScript(inputReturn)
+            goalReturn, goalCvar, goalSharpe, goal_sizes, goal_labels = optimizeScript2(inputReturn)
 
             #saving metrics to session for passing
             request.session['inputSizes'] = inputSizes
             request.session['inputLabels'] = inputLabels
-            request.session['inputReturn'] = inputReturn
-            request.session['inputCvar'] = inputCvar
-            request.session['inputSharpe'] = inputSharpe
+            request.session['inputReturn'] = str(round(inputReturn*100,2))+"%"
+            request.session['inputCvar'] = str(round(inputCvar*100, 2))+"%"
+            request.session['inputSharpe'] = str(round(inputSharpe, 2))
 
             request.session['outputSizes'] = goal_sizes
             request.session['outputLabels'] = goal_labels
@@ -78,9 +115,12 @@ def betterRender(request):
     outCvar = request.session.get('outputCvar')
     outSharpe = request.session.get('outputSharpe')
 
-    print(insizes, inlabels, outsizes, outlabels)
+    #print(insizes, inlabels, outsizes, outlabels)
 
-    html_graph = plotDualPie(insizes, inlabels, outsizes, outlabels)
+    inPieSize, inPieLabel = pieCompressor(insizes, inlabels, 0.05)
+    outPieSize, outPieLabel = pieCompressor(outsizes, outlabels, 0.05)
+
+    html_graph = plotDualPie(inPieSize, inPieLabel, outPieSize, outPieLabel)
 
     if request.method == 'POST':
         form = portfolioSaveForm(request.POST)
@@ -93,7 +133,7 @@ def betterRender(request):
 
             for i in range(0,len(outlabels)):
                 saveTicker = stockID.objects.get(pk=outlabels[i])
-                asset = PortfolioWeights(portfolioID = p, tickerID = saveTicker, volume = outsizes[i]/100)
+                asset = PortfolioWeights(portfolioID = p, tickerID = saveTicker, volume = outsizes[i])
                 asset.save()
 
             #freeing session variables to prevent leakage into other functions
@@ -123,11 +163,18 @@ def goal(request):
             monthlyGoal = (1+inputGoal)**(22/inputHorizon) - 1
             
             #optimize portfolio based on input parameters
-            goalReturn, goalCvar, goalSharpe, goal_sizes, goal_labels = optimizeScript(monthlyGoal)
+            goalReturn, goalCvar, goalSharpe, goal_sizes, goal_labels = optimizeScript2(monthlyGoal)
+            compressed_sizes, compressed_labels = portfolioCompressor(goal_sizes, goal_labels, 0.01)
+
+            #print(type(goalReturn))
+            #print(type(goalCvar))
+            #print(type(goalSharpe))
+            #print(type(compressed_sizes))
+            #print(type(compressed_labels))
 
             #saving metrics for passing to the saving screen
-            request.session['sizes'] = goal_sizes
-            request.session['labels'] = goal_labels
+            request.session['sizes'] = compressed_sizes
+            request.session['labels'] = compressed_labels
             request.session['portfolioReturn'] = str(round(goalReturn*100, 2))+"%"
             request.session['cvar'] = str(round(goalCvar*100, 2))+"%"
             request.session['sharpe'] = str(round(goalSharpe, 2))
@@ -141,7 +188,7 @@ def goal(request):
         html_graph = emptyPlot()
         goalReturn, goalCvar, goalSharpe = '','',''
         #print(type(html_graph))
-    return render(request, 'goal_paul.html', {'graph':html_graph, 'form': form, 'return':goalReturn, 'cvar':goalCvar, 'sharpe':goalSharpe})
+    return render(request, 'goal_paul.html', {'form': form})
 
 @login_required
 def goalRender(request):
@@ -151,7 +198,12 @@ def goalRender(request):
     portReturn = request.session.get('portfolioReturn')
     portCvar = request.session.get('cvar')
     portSharpe = request.session.get('sharpe')
-    html_graph = plotPie(sizes, labels)
+
+    print(sizes)
+    print(sum(sizes))
+    
+    piesize, pielabel = pieCompressor(sizes, labels, 0.03)
+    html_graph = plotPie(piesize, pielabel)
 
     if request.method == 'POST':
         form = portfolioSaveForm(request.POST)
@@ -164,7 +216,7 @@ def goalRender(request):
 
             for i in range(0,len(labels)):
                 saveTicker = stockID.objects.get(pk=labels[i])
-                asset = PortfolioWeights(portfolioID = p, tickerID = saveTicker, volume = sizes[i]/100)
+                asset = PortfolioWeights(portfolioID = p, tickerID = saveTicker, volume = sizes[i])
                 asset.save()
 
             #freeing session variables to prevent leakage into other functions
@@ -183,16 +235,20 @@ def goalRender(request):
     return render(request, 'goalRender_paul.html', {'form':form, 'graph':html_graph, 'return':portReturn, 'cvar':portCvar, 'sharpe':portSharpe})
 
 def demo(request):
-    #sizes1 = [0.5,0.3,0.2]
-    #labels1 = ['tesing','testing','testing']
+    sizes1 = [0.5,0.3,0.1, 0.05, 0.02, 0.02, 0.01]
+    labels1 = ['a','b','c', 'd', 'e','f','g']
 
     #sizes2 = [0.7,0.1,0.2]
     #labels2 = ['testing','tesing','testing']
 
-    volumeToValue(stockID.objects.filter(tickerID='AAPL')[0], 0)
-    html_graph = emptyPlot()
+    #volumeToValue(stockID.objects.filter(tickerID='AAPL')[0], 0)
+    #html_graph = emptyPlot()
+    #optimizeTester()
+    testsize, testlabel = portfolioCompressor(sizes1, labels1, 0.1)
+    print(testsize)
+    print(testlabel)
     form = optimizeGoalForm()
-    return render(request, 'demo.html', {'form': form, 'demoVar':6, 'graph':html_graph})
+    return render(request, 'demo.html', {'form': form, 'demoVar':6})
 
 @login_required
 def backtest(request):
@@ -266,8 +322,14 @@ def portfolio(request):
 
             #converting volumes to weights
             val1 = volumeToValue(t1, w1)
-            val2 = volumeToValue(t2, w2)
-            val3 = volumeToValue(t3, w3)
+            if ((t2 is not None) and (w2 is not None)):
+                val2 = volumeToValue(t2, w2)
+            else:
+                val2 = 0
+            if ((t3 is not None) and (w3 is not None)):
+                val3 = volumeToValue(t3, w3)
+            else:
+                val3 = 0
             tot_val = val1 + val2 + val3
 
             #saving asset weights
